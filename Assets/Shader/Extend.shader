@@ -1,7 +1,7 @@
 ﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Custom/detections/extends"
+Shader "Custom/TextureTilling"
 {
     Properties
     {
@@ -38,7 +38,6 @@ Shader "Custom/detections/extends"
             {
                 float4 pos: SV_POSITION;
                 fixed4 color: COLOR;
-                //float3 norm: NORMAL;
                 float2 uv: TEXCOORD0;
                 float3 extend: TEXCOORD1;
             };
@@ -46,32 +45,18 @@ Shader "Custom/detections/extends"
             v2f vert(appdata_full v)
             {
                 v2f o;
-                
-                //o.norm = v.normal.xyz;
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.texcoord.xy, _MainTex); //Tiling and Offset
                 
                 float4 centerPos = mul(unity_ObjectToWorld, float4(0, 0, 0, 1)); // Position
                 float4 cornerPos = mul(unity_ObjectToWorld, float4(1, 1, 1, 1)); // Scale
-                o.extend = (cornerPos - centerPos);
-                
-                //assign color and alpha
-                // o.color.xyz = _Color.xyz;
-                // o.color.w = 1;
-
-                o.uv *= o.extend.xz;
+                o.uv *= (cornerPos - centerPos).xz;
 
                 return o;
             }
             
             fixed4 frag(v2f i): COLOR
             {
-                // fixed4 o;
-                // fixed4 tex = _Color * tex2D(_MainTex, i.uv * (i.extend));
-                
-                // o = tex;
-                // return o;
-
                 return tex2D(_MainTex, i.uv) * _Color;
             }
             
